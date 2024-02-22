@@ -31,7 +31,7 @@ async def handle_validation_error(request: fastapi.Request, exc: fastapi.excepti
 async def root(payload: Any = fastapi.Depends(payload_models.model_from_form)) -> str:
 
     if isinstance(payload, payload_models.MediaEvent):
-        request_data[payload.event] = payload.model_dump(by_alias=True)
+        request_data[payload.event] = payload.model_dump_json(by_alias=True)
     else:
         unknown_events = request_data.get('unknown_events', [])
         unknown_events.append(payload)
