@@ -1,17 +1,13 @@
-from fastapi import FastAPI, Request
-import json
+from fastapi import FastAPI
 
-
+from hueplex.PayloadModels import Payload
 
 app = FastAPI()
 
 
 @app.post('/')
-async def root(request: Request) -> bytes:
-
-    print(await request.body())
-
-    return b""
+async def root(payload: Payload) -> str:
+    return payload.event
 
 
 @app.get('/')
