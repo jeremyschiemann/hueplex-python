@@ -1,22 +1,42 @@
-import json
 from typing import Dict, Any
 
 import fastapi
 from fastapi import FastAPI
+from fastapi.exception_handlers import request_validation_exception_handler
 
-from hueplex.payload_models import Payload
+from hueplex import payload_models
 
 app = FastAPI()
 
 request_data = {}
 
 
-@app.post('/plex-webhook')
-async def root(payload: str = fastapi.Form(...)) -> str:
-    data = json.loads(payload)
-    request_data[data['event']] = data
-    return 'success'
+@app.exception_handler(fastapi.exceptions.RequestValidationError)
+async def handle_validation_error(request: fastapi.Request, exc: fastapi.exceptions.RequestValidationError):
 
+    errors = request_data.get('errors', [])
+    errors.append(
+        {
+            'body': exc.body,
+            'detail': exc.errors(),
+        },
+    )
+    request_data['errors'] = errors
+
+    return request_validation_exception_handler(request, exc)
+
+
+
+@app.post('/plex-webhook')
+async def root(payload: Any = fastapi.Depends(payload_models.model_from_form)) -> str:
+
+    if isinstance(payload, payload_models.MediaEvent):
+        request_data[payload.event] = payload.model_dump(by_alias=True)
+    else:
+        unknown_events = request_data.get('unknown_events', [])
+        unknown_events.append(payload)
+        request_data['unknown_events'] = unknown_events
+    return 'success'
 
 
 @app.get('/')

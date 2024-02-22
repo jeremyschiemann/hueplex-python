@@ -1,11 +1,11 @@
 import datetime
 import json
+import typing
 
 from fastapi import Form
-from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress
+from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress, Tag, Discriminator, RootModel
 
-from typing import Annotated
-
+from typing import Annotated, Any, Dict, Union
 
 
 class Account(BaseModel):
@@ -43,7 +43,8 @@ class Metadata(BaseModel):
     summary: str
     index: int
     parent_index: Annotated[int, Field(alias='parentIndex')]
-    rating_count: Annotated[int, Field(alias='ratingCount')]
+    rating_count: Annotated[int | None, Field(alias='ratingCount')] = None
+
     thumb: str
     art: str
     parent_thumb: Annotated[str, Field(alias='parentThumb')]
@@ -53,7 +54,7 @@ class Metadata(BaseModel):
     updated_at: Annotated[datetime.datetime, Field(alias='updatedAt')]
 
 
-class Payload(BaseModel):
+class MediaEvent(BaseModel):
     event: str
     user: bool
     owner: bool
@@ -62,12 +63,19 @@ class Payload(BaseModel):
     player: Annotated[Player, Field(alias='Player')]
     metadata: Annotated[Metadata, Field(alias='Metadata')]
 
-    @classmethod
-    def from_form(
-            cls,
-            payload: str = Form(...),
-    ) -> 'Payload':
 
-        print(payload)
+Events = Union[
+    Annotated[MediaEvent, Tag('media')],
+    Annotated[Dict[str, Any], Tag('')]
+]
 
-        return cls(**json.loads(payload))
+def get_discriminator_value(v: Dict[str, Any]) -> str | None:
+    tags = [event_type.__metadata__[0].tag for event_type in typing.get_args(Events) if event_type.__metadata__[0].tag]
+    event = v.get('event', '').split('.')[0]
+
+    return event if event in tags else ''
+
+def model_from_form(payload: str = Form(...)) -> Events:
+    return RootModel[
+        Annotated[Events, Discriminator(get_discriminator_value)]
+    ](**json.loads(payload)).root
