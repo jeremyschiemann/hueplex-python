@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union, List
 
 import fastapi
 from fastapi import FastAPI
@@ -39,6 +39,9 @@ async def root(payload: Any = fastapi.Depends(payload_models.model_from_form)) -
     return 'success'
 
 
-@app.get('/')
-async def root_get() -> Dict[str, Any]:
+@app.get(
+    '/',
+    response_model=Dict[str, Union[payload_models.Events, List[Any]]]
+)
+async def root_get() -> Dict[str, payload_models.Events]:
     return request_data
