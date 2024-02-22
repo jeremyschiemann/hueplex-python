@@ -9,4 +9,4 @@ COPY hueplex ./
 
 RUN poetry install
 
-CMD poetry run uviorn 'hueplex.server:app' --host 0.0.0.0 --port 5000
+CMD poetry run uvicorn 'hueplex.server:app' --host 0.0.0.0 --port 5000
