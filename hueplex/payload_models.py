@@ -69,5 +69,5 @@ class Payload(BaseModel):
     ) -> 'Payload':
 
         print(payload)
-        
+
         return cls(**json.loads(payload))
