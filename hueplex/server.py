@@ -6,8 +6,8 @@ from hueplex.payload_models import Payload
 app = FastAPI()
 
 
-@app.post('/')
-async def root(payload: Payload = fastapi.Form()) -> str:
+@app.post('/plex-webhook')
+async def root(payload: Payload = fastapi.Depends(Payload.from_form)) -> str:
     return payload.event
 
 

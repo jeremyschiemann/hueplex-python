@@ -1,8 +1,11 @@
 import datetime
+import json
 
+from fastapi import Form
 from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress
 
 from typing import Annotated
+
 
 
 class Account(BaseModel):
@@ -58,3 +61,10 @@ class Payload(BaseModel):
     server: Annotated[Server, Field(alias='Server')]
     player: Annotated[Player, Field(alias='Player')]
     metadata: Annotated[Metadata, Field(alias='Metadata')]
+
+    @classmethod
+    def from_form(
+            cls,
+            payload: str = Form(...),
+    ) -> 'Payload':
+        return cls(**json.loads(payload))
