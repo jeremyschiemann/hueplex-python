@@ -1,7 +1,7 @@
 import fastapi
 from fastapi import FastAPI
 
-from hueplex.PayloadModels import Payload
+from hueplex.payload_models import Payload
 
 app = FastAPI()
 

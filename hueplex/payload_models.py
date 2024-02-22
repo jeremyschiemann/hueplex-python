@@ -29,7 +29,7 @@ class Metadata(BaseModel):
     key: str
     parent_rating_key: Annotated[str, Field(alias='parentRatingKey')]
     grandparent_rating_key: Annotated[str, Field(alias='grandparentRatingKey')]
-    guuid: str
+    guid: str
     library_selection_id: Annotated[int, Field(alias='librarySectionID')]
     type: str
     title: str
@@ -47,7 +47,7 @@ class Metadata(BaseModel):
     grandparent_thumb: Annotated[str, Field(alias='grandparentThumb')]
     grandparent_art: Annotated[str, Field(alias='grandparentArt')]
     added_at: Annotated[datetime.datetime, Field(alias='addedAt')]
-    uploaded_at: Annotated[datetime.datetime, Field(alias='uploadedAt')]
+    updated_at: Annotated[datetime.datetime, Field(alias='updatedAt')]
 
 
 class Payload(BaseModel):
@@ -55,6 +55,6 @@ class Payload(BaseModel):
     user: bool
     owner: bool
     account: Annotated[Account, Field(alias='Account')]
-    server: Annotated[Server, Field(alis='Server')]
+    server: Annotated[Server, Field(alias='Server')]
     player: Annotated[Player, Field(alias='Player')]
     metadata: Annotated[Metadata, Field(alias='Metadata')]
