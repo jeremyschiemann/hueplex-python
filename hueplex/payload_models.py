@@ -3,7 +3,7 @@ import json
 import typing
 
 from fastapi import Form
-from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress, Tag, Discriminator, RootModel
+from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress, Tag, Discriminator, RootModel, field_serializer
 
 from typing import Annotated, Any, Dict, Union
 
@@ -20,10 +20,13 @@ class Server(BaseModel):
 
 
 class Player(BaseModel):
+
+
     local: bool
     public_address: Annotated[IPvAnyAddress, Field(alias='publicAddress')]
     title: str
     uuid: str
+
 
 
 class Metadata(BaseModel):
