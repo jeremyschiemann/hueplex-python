@@ -67,4 +67,7 @@ class Payload(BaseModel):
             cls,
             payload: str = Form(...),
     ) -> 'Payload':
+
+        print(payload)
+        
         return cls(**json.loads(payload))
