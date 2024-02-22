@@ -1,3 +1,4 @@
+import fastapi
 from fastapi import FastAPI
 
 from hueplex.PayloadModels import Payload
@@ -6,7 +7,7 @@ app = FastAPI()
 
 
 @app.post('/')
-async def root(payload: Payload) -> str:
+async def root(payload: Payload = fastapi.Form()) -> str:
     return payload.event
 
 
