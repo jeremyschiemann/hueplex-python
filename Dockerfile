@@ -2,11 +2,11 @@ FROM python:3.11-buster
 
 RUN pip install poetry
 
-WORKDIR /app
+WORKDIR ./app
 
 COPY pyproject.toml poetry.lock ./
-COPY hueplex ./
+ADD hueplex ./hueplex
 
 RUN poetry install
 
-CMD poetry run uvicorn 'hueplex.server:app' --host 0.0.0.0 --port 5000
+CMD poetry run uvicorn hueplex.server:app --host 0.0.0.0 --port 5000
