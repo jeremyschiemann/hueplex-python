@@ -64,6 +64,10 @@ async def root_get() -> Dict[str, Union[payload.Events, List[Any]]]:
     return request_data
 
 
+@app.get('/debug')
+async def debug():
+    return payload.debug
+
 @app.get(
     '/event_schemas',
     response_class=PrettyJSONResponse
