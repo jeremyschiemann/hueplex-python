@@ -67,8 +67,9 @@ async def handle_validation_error(request: fastapi.Request, exc: fastapi.excepti
 
 
 def handle_media_command(command: Dict[str, Any], hue_key: str):
+
     requests.put(
-        f'https://192.168.1.11/clip/v2/resource/zone/{command["zone"]}',
+        f'https://192.168.1.11/clip/v2/resource/grouped_light/{command["zone"]}',
         json=command['command'],
         headers={'hue-application-key': hue_key},
         verify=False,
