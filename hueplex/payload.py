@@ -23,6 +23,9 @@ def get_discriminator_value(v: Dict[str, Any]) -> str | None:
     return event if event in tags else ''
 
 def model_from_form(payload: Json = Form(...)) -> Events:
+    print('\n\n\n')
+    print(payload)
+    print('\n\n\n')
     return RootModel[
         Annotated[Events, Discriminator(get_discriminator_value)]
     ](**payload).root
