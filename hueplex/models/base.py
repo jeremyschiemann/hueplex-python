@@ -1,7 +1,8 @@
+from pathlib import Path
 from typing import Annotated
 
 import pydantic
-from pydantic import BaseModel, Field, FilePath, HttpUrl, ConfigDict
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 
 class Account(BaseModel):
@@ -30,5 +31,5 @@ class Metadata(BaseModel):
 
     library_section_type: Annotated[str, Field(alias='librarySectionType')]
     type: str
-    thumb: FilePath
-    art: FilePath
+    thumb: Path
+    art: Path
