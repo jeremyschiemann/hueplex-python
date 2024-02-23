@@ -1,14 +1,25 @@
 import json
+import os
+from contextlib import asynccontextmanager
 from typing import Dict, Any, Union, List
 
 import fastapi
 import pydantic
 from fastapi import FastAPI
+import requests
 from fastapi.exception_handlers import request_validation_exception_handler
 from pydantic import schema_of
 
 from hueplex import payload
 from hueplex.models.base import BaseEvent
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield {
+        'hue_key': os.getenv('HUE_KEY', None)
+    }
+
+
 
 app = FastAPI()
 
@@ -43,15 +54,46 @@ async def handle_validation_error(request: fastapi.Request, exc: fastapi.excepti
 
 
 
-@app.post('/plex-webhook')
-async def root(payload: payload.Events = fastapi.Depends(payload.model_from_form)) -> str:
+def handle_media_command(command: str, hue_key: str):
 
-    if isinstance(payload, BaseEvent):
-        request_data[payload.event] = payload
-    else:
+    light = 'ae8cef70-3421-4fb7-a5db-07aae0ef319b'
+
+    match command:
+        case "play" | "resume":
+            on = False
+        case "pause" | "stop":
+            on = True
+        case _:
+            return
+
+    requests.put(
+        f'https://192.168.1.11/clip/v2/resource/light/{light}',
+        json={'on': {'on': on}},
+        headers={'hue-application-key': hue_key},
+        verify=False,
+    )
+
+
+@app.post('/plex-webhook')
+async def root(
+        request: fastapi.Request,
+        payload: payload.Events = fastapi.Depends(payload.model_from_form),
+) -> str:
+
+    if not isinstance(payload, BaseEvent):
         unknown_events = request_data.get('unknown_events', [])
         unknown_events.append(payload)
         request_data['unknown_events'] = unknown_events
+        return 'unknown'
+
+    if not request.state.hue_key:
+        return 'no key'
+    event = payload.event
+
+    match event.split('.'):
+        case ['media', command]:
+            handle_media_command(command, request.state.hue_key)
+
     return 'success'
 
 
