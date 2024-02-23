@@ -1,14 +1,30 @@
-from typing import Dict, Any, Union, List
+import json
+from typing import Dict, Any, Union, List, get_args, Mapping
 
 import fastapi
 from fastapi import FastAPI
 from fastapi.exception_handlers import request_validation_exception_handler
+from pydantic import schema_of, schema_json_of, Json
+from starlette.background import BackgroundTask
 
-from hueplex import payload_models
+from hueplex import payload
+from hueplex.models.base import BaseEvent
 
 app = FastAPI()
 
 request_data = {}
+
+
+class PrettyJSONResponse(fastapi.responses.JSONResponse):
+
+    def render(self, content: Any) -> bytes:
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=2,
+            separators=(",", ":"),
+        ).encode("utf-8")
 
 
 @app.exception_handler(fastapi.exceptions.RequestValidationError)
@@ -28,9 +44,9 @@ async def handle_validation_error(request: fastapi.Request, exc: fastapi.excepti
 
 
 @app.post('/plex-webhook')
-async def root(payload: Any = fastapi.Depends(payload_models.model_from_form)) -> str:
+async def root(payload: payload.Events = fastapi.Depends(payload.model_from_form)) -> str:
 
-    if isinstance(payload, payload_models.BaseEvent):
+    if isinstance(payload, BaseEvent):
         request_data[payload.event] = payload
     else:
         unknown_events = request_data.get('unknown_events', [])
@@ -41,7 +57,17 @@ async def root(payload: Any = fastapi.Depends(payload_models.model_from_form)) -
 
 @app.get(
     '/',
-    response_model=Dict[str, Union[payload_models.Events, List[Any]]]
+    response_model=Dict[str, Union[payload.Events, List[Any]]]
 )
-async def root_get() -> Dict[str, Union[payload_models.Events, List[Any]]]:
+async def root_get() -> Dict[str, Union[payload.Events, List[Any]]]:
     return request_data
+
+
+@app.get(
+    '/event_schemas',
+    response_class=PrettyJSONResponse
+)
+async def get_schemas():
+    return schema_of(payload.Events, title='Event Schemas')
+
+
