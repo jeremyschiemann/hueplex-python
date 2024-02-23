@@ -1,12 +1,11 @@
 import json
-from typing import Dict, Any, Union, List, get_args, Mapping
+from typing import Dict, Any, Union, List
 
 import fastapi
 import pydantic
 from fastapi import FastAPI
 from fastapi.exception_handlers import request_validation_exception_handler
-from pydantic import schema_of, schema_json_of, Json
-from starlette.background import BackgroundTask
+from pydantic import schema_of
 
 from hueplex import payload
 from hueplex.models.base import BaseEvent
@@ -58,21 +57,18 @@ async def root(payload: payload.Events = fastapi.Depends(payload.model_from_form
 
 @app.get(
     '/',
+    response_class=PrettyJSONResponse,
     response_model=Dict[str, Union[payload.Events, List[Any]]]
 )
 async def root_get() -> Dict[str, Union[payload.Events, List[Any]]]:
     return request_data
 
-
-@app.get('/debug')
-async def debug():
-    return payload.debug
-
 @app.get(
     '/event_schemas',
-    response_class=PrettyJSONResponse
+    response_class=PrettyJSONResponse,
+    response_model=Dict[str, Any],
 )
-async def get_schemas():
+async def get_schemas() -> Dict[str, Any]:
     return schema_of(payload.Events, title='Event Schemas')
 
 

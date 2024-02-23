@@ -1,7 +1,7 @@
-import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field, FilePath, HttpUrl
+import pydantic
+from pydantic import BaseModel, Field, FilePath, HttpUrl, ConfigDict
 
 
 class Account(BaseModel):
@@ -23,17 +23,12 @@ class BaseEvent(BaseModel):
     server: Annotated[Server, Field(alias='Server')]
 
 
-class BaseMetadata(BaseModel):
+class Metadata(BaseModel):
+    model_config = ConfigDict(
+        extra=pydantic.Extra.allow,
+    )
+
     library_section_type: Annotated[str, Field(alias='librarySectionType')]
-    rating_key: Annotated[str, Field(alias='ratingKey')]
-    key: str
-    guid: str
     type: str
-    title: str
-    library_section_id: Annotated[int, Field(alias='librarySectionID')]
-    summary: str
-    index: int
-    thumb: str
-    art: str
-    added_at: Annotated[datetime.datetime, Field(alias='addedAt')]
-    updated_at: Annotated[datetime.datetime, Field(alias='updatedAt')]
+    thumb: FilePath
+    art: FilePath
