@@ -2,6 +2,7 @@ import json
 from typing import Dict, Any, Union, List, get_args, Mapping
 
 import fastapi
+import pydantic
 from fastapi import FastAPI
 from fastapi.exception_handlers import request_validation_exception_handler
 from pydantic import schema_of, schema_json_of, Json
@@ -28,12 +29,13 @@ class PrettyJSONResponse(fastapi.responses.JSONResponse):
 
 
 @app.exception_handler(fastapi.exceptions.RequestValidationError)
-async def handle_validation_error(request: fastapi.Request, exc: fastapi.exceptions.RequestValidationError):
+@app.exception_handler(pydantic.ValidationError)
+async def handle_validation_error(request: fastapi.Request, exc: fastapi.exceptions.RequestValidationError | pydantic.ValidationError):
 
     errors = request_data.get('errors', [])
     errors.append(
         {
-            'body': exc.body,
+            'body': exc.body if isinstance(exc, fastapi.exceptions.RequestValidationError) else str(exc),
             'detail': exc.errors(),
         },
     )
