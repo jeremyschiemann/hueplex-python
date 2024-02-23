@@ -29,13 +29,12 @@ class PrettyJSONResponse(fastapi.responses.JSONResponse):
 
 
 @app.exception_handler(fastapi.exceptions.RequestValidationError)
-@app.exception_handler(pydantic.ValidationError)
 async def handle_validation_error(request: fastapi.Request, exc: fastapi.exceptions.RequestValidationError | pydantic.ValidationError):
 
     errors = request_data.get('errors', [])
     errors.append(
         {
-            'body': exc.body if isinstance(exc, fastapi.exceptions.RequestValidationError) else str(exc),
+            'body': exc.body,
             'detail': exc.errors(),
         },
     )
