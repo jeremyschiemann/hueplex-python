@@ -30,7 +30,7 @@ async def handle_validation_error(request: fastapi.Request, exc: fastapi.excepti
 @app.post('/plex-webhook')
 async def root(payload: Any = fastapi.Depends(payload_models.model_from_form)) -> str:
 
-    if isinstance(payload, payload_models.MediaEvent):
+    if isinstance(payload, payload_models.BaseEvent):
         request_data[payload.event] = payload
     else:
         unknown_events = request_data.get('unknown_events', [])

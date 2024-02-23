@@ -57,18 +57,26 @@ class Metadata(BaseModel):
     updated_at: Annotated[datetime.datetime, Field(alias='updatedAt')]
 
 
-class MediaEvent(BaseModel):
+class BaseEvent(BaseModel):
     event: str
     user: bool
     owner: bool
     account: Annotated[Account, Field(alias='Account')]
     server: Annotated[Server, Field(alias='Server')]
+
+
+class MediaEvent(BaseEvent):
     player: Annotated[Player, Field(alias='Player')]
     metadata: Annotated[Metadata, Field(alias='Metadata')]
 
 
+class AdminEvent(BaseEvent):
+    ...
+
+
 Events = Union[
     Annotated[MediaEvent, Tag('media')],
+    Annotated[AdminEvent, Tag('admin')],
     Annotated[Dict[str, Any], Tag('')]
 ]
 
