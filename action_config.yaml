@@ -10,8 +10,8 @@ actions:
     hue:
       zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
       command:
-        on:
-          on: false
+        'on':
+          'on': false
   - plex:
       event: media.resume
       Player:
@@ -23,8 +23,8 @@ actions:
     hue:
       zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
       command:
-        on:
-          on: false
+        'on':
+          'on': false
   - plex:
       event: media.stop
       Player:
@@ -36,8 +36,8 @@ actions:
     hue:
       zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
       command:
-        on:
-          on: true
+        'on':
+          'on': true
   - plex:
       event: media.pause
       Player:
@@ -49,5 +49,5 @@ actions:
     hue:
       zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
       command:
-        on:
-          on: true
+        'on':
+          'on': true
