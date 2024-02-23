@@ -1,6 +1,7 @@
 import json
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Dict, Any, Union, List
 
 import fastapi
@@ -12,11 +13,22 @@ from pydantic import schema_of
 
 from hueplex import payload
 from hueplex.models.base import BaseEvent
+import yaml
+
+from hueplex.models.media import MediaEvent
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
+    root_path = Path(__file__).parent.parent
+
+    with open(root_path / 'action_config.yaml') as f:
+        content = yaml.safe_load(f)
+
     yield {
-        'hue_key': os.getenv('HUE_KEY', None)
+        'hue_key': os.getenv('HUE_KEY', None),
+        'config': content,
     }
 
 
@@ -54,21 +66,10 @@ async def handle_validation_error(request: fastapi.Request, exc: fastapi.excepti
 
 
 
-def handle_media_command(command: str, hue_key: str):
-
-    light = 'ae8cef70-3421-4fb7-a5db-07aae0ef319b'
-
-    match command:
-        case "play" | "resume":
-            on = False
-        case "pause" | "stop":
-            on = True
-        case _:
-            return
-
+def handle_media_command(command: Dict[str, Any], hue_key: str):
     requests.put(
-        f'https://192.168.1.11/clip/v2/resource/light/{light}',
-        json={'on': {'on': on}},
+        f'https://192.168.1.11/clip/v2/resource/zone/{command["zone"]}',
+        json=command['command'],
         headers={'hue-application-key': hue_key},
         verify=False,
     )
@@ -88,11 +89,17 @@ async def root(
 
     if not request.state.hue_key:
         return 'no key'
-    event = payload.event
 
-    match event.split('.'):
-        case ['media', command]:
-            handle_media_command(command, request.state.hue_key)
+    for action in request.state.config['actions']:
+        payload: MediaEvent
+        conditions = (
+            action['plex']['event'] == payload.event,
+            action['plex']['Player']['title'] == payload.player.title,
+            action['plex']['Account']['title'] == payload.account.title,
+            action['plex']['Metadata']['type'] == payload.metadata.type,
+        )
+        if all(conditions):
+            handle_media_command(action['hue'], request.state.hue_key)
 
     return 'success'
 

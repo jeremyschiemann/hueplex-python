@@ -1,0 +1,53 @@
+actions:
+  - plex:
+      event: media.play
+      Player:
+        title: SHIELD Android TV
+      Account:
+        title: Verel
+      Metadata:
+        type: movie
+    hue:
+      zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
+      command:
+        on:
+          on: false
+  - plex:
+      event: media.resume
+      Player:
+        title: SHIELD Android TV
+      Account:
+        title: Verel
+      Metadata:
+        type: movie
+    hue:
+      zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
+      command:
+        on:
+          on: false
+  - plex:
+      event: media.stop
+      Player:
+        title: SHIELD Android TV
+      Account:
+        title: Verel
+      Metadata:
+        type: movie
+    hue:
+      zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
+      command:
+        on:
+          on: true
+  - plex:
+      event: media.pause
+      Player:
+        title: SHIELD Android TV
+      Account:
+        title: Verel
+      Metadata:
+        type: movie
+    hue:
+      zone: '8bc7bba4-7bc5-4bc7-972c-0efeb0caf30e'
+      command:
+        on:
+          on: true
