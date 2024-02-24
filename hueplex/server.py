@@ -10,6 +10,8 @@ from fastapi import FastAPI
 import requests
 from fastapi.exception_handlers import request_validation_exception_handler
 from pydantic import schema_of
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 from hueplex import payload
 from hueplex.models.base import BaseEvent
@@ -26,14 +28,20 @@ async def lifespan(app: FastAPI):
     with open(root_path / 'action_config.yaml') as f:
         content = yaml.safe_load(f)
 
+    bridge_ip = requests.get('https://discovery.meethue.com/').json()[0]['internalipaddress']
+
     yield {
         'hue_key': os.getenv('HUE_KEY', None),
         'config': content,
+        'bridge_ip': bridge_ip,
     }
 
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title='Hue Plex',
+    lifespan=lifespan,
+)
 
 request_data = {}
 
@@ -114,7 +122,7 @@ async def root(
 
 
 @app.get(
-    '/',
+    '/req',
     response_class=PrettyJSONResponse,
     response_model=Dict[str, Union[payload.Events, List[Any]]]
 )
@@ -130,3 +138,41 @@ async def get_schemas() -> Dict[str, Any]:
     return schema_of(payload.Events, title='Event Schemas')
 
 
+app.mount('/static', StaticFiles(directory='static'), 'static')
+
+templates = Jinja2Templates(directory="templates")
+
+@app.get(
+    '/',
+    response_class=fastapi.responses.HTMLResponse,
+)
+def root(request: fastapi.Request):
+
+    res = requests.get(
+        f'https://{request.state.bridge_ip}/clip/v2/resource',
+        headers={'hue-application-key': request.state.hue_key},
+        verify=False,
+    )
+    all_resource = res.json()['data']
+    data_types = {}
+    for resource in all_resource:
+        l = data_types.get(resource['type'], [])
+        l.append(resource)
+        data_types[resource['type']] = l
+
+    app:fastapi.FastAPI = request.app
+    return templates.TemplateResponse(
+        request=request,
+        name='index.html',
+        context={
+            'app_name': app.openapi()['info']['title'],
+            'resources': data_types,
+        },
+    )
+
+@app.get(
+    '/clicked',
+    response_class=fastapi.responses.PlainTextResponse,
+)
+def clicked(request: fastapi.Request):
+    return 'clicked it!'
