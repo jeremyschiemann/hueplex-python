@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorize Philips Hue Bridge</title>
+    <link href="{{ url_for('static', path='/output.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', path='/htmx.min.js') }}"></script>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center h-screen">
+
+    <div hx-get="{{ url_for('hue_auth_status') }}" hx-trigger="load" hx-swap="innerHTML" class="max-w-md mx-auto bg-gray-200 dark:bg-gray-800 p-8 rounded-lg shadow-lg flex items-center"> <!-- Added flex and items-center -->
+
+    </div>
+</body>
+
+
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <link href="{{ url_for('static', path='/output.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', path='/htmx.min.js') }}"></script>
+</head>
+
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white transition-colors duration-500 flex items-center justify-center h-screen">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold mb-4">Hue Plex Status</h1>
+
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" value="" class="sr-only peer" hx-put="/status" hx-swap="none" {% if is_active %}checked{% endif %} >
+          <div class="relative w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+        </label>
+    </div>
+</body>
+
+</html>

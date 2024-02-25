@@ -11,4 +11,4 @@ dl-tailwind:
 
 server:
 	poetry install
-	HUE_KEY=VedQTM3d0McDdG7WapcajTtKE6F1kSY3qv3CYtIi poetry run uvicorn hueplex.server:app --reload
+	poetry run uvicorn hueplex.server:app --reload
