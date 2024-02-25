@@ -51,7 +51,7 @@ async def plex_webhook(
 
     for action in request.state.config['actions']:
         payload: MediaEvent
-        if is_contained(action['plex'], payload.model_dump()):
+        if is_contained(action['plex'], payload.model_dump(by_alias=True)):
             await handle_media_command(request.state.http_client, request.state.bridge_ip, action['hue'])
 
     return 'success'
