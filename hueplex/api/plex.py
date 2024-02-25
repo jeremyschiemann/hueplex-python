@@ -25,7 +25,7 @@ router = fastapi.APIRouter()
 async def get_received_hooks():
     return hooks_received
 
-router.get(
+@router.get(
     '/event_schemas',
     response_class=PrettyJSONResponse,
     response_model=Dict[str, Any],
@@ -34,7 +34,7 @@ async def get_schemas() -> Dict[str, Any]:
     return schema_of(payload.Events, title='Event Schemas')
 
 
-router.post('/plex-webhook')
+@router.post('/plex-webhook')
 async def root(
         request: fastapi.Request,
         payload: payload.Events = fastapi.Depends(payload.model_from_form),
