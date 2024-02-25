@@ -35,7 +35,7 @@ async def get_schemas() -> Dict[str, Any]:
 
 
 @router.post('/plex-webhook')
-async def root(
+async def plex_webhook(
         request: fastapi.Request,
         payload: payload.Events = fastapi.Depends(payload.model_from_form),
 ) -> str:
@@ -57,7 +57,7 @@ async def root(
     return 'success'
 
 
-async def is_contained(small: Dict[str, Any], big: Dict[str, Any]):
+def is_contained(small: Dict[str, Any], big: Dict[str, Any]):
     for key, value in small.items():
         if key not in big:
             return False
